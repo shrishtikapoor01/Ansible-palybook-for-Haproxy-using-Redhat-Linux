@@ -1,0 +1,36 @@
+- hosts: frontend
+  vars:
+      x: "8080"
+  tasks:
+          - name: "install haproxy"
+            package:
+                    name: "haproxy"
+          - name: "copy conf file"
+            template:
+                    src: "/etc/haproxy/haproxy.cfg"
+                    dest: "/etc/haproxy/haproxy.cfg"
+            notify: restart haproxy
+          - name: "starting haproxy service"
+            service:
+                    name: "haproxy"
+                    state: started
+  handlers:
+          - name: "restart haproxy"
+            service:
+                    name: "haproxy"
+                    state: restarted
+- hosts: backend
+  tasks:
+         - name: "install httpd"
+           package:
+                    name:
+                    - "httpd"
+                    - "php"
+         - name: "starting httpd service"
+           service:
+                   name: "httpd"
+                   state: started
+         - name: "copy file"
+           copy:
+                   src: "task.php"
+                   dest: "/var/www/html"
